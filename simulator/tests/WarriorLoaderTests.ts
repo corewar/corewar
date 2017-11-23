@@ -14,7 +14,7 @@ import DataHelper from "./DataHelper";
 
 "use strict";
 
-describe("WarriorLoader",() => {
+describe("WarriorLoader", () => {
 
     var instruction = DataHelper.instruction;
 
@@ -38,7 +38,7 @@ describe("WarriorLoader",() => {
 
     function buildCore(size: number): ICore {
         var core = {
-            getSize: () => { return 0; },
+            getSize: () => { return core.instructions.length; },
             coreAccess: new LiteEvent<ICoreAccessEventArgs>(),
             instructions: [],
             initialise: (options: IOptions) => {
@@ -78,7 +78,7 @@ describe("WarriorLoader",() => {
         return core;
     }
 
-    it("Applies metadata to the warrior",() => {
+    it("Applies metadata to the warrior", () => {
 
         var parseResult: IParseResult = {
             tokens: [],
@@ -100,7 +100,7 @@ describe("WarriorLoader",() => {
         expect(actual.strategy).toBe("This is a strategy\nit has two lines");
     });
 
-    it("Creates a single process for the warrior",() => {
+    it("Creates a single process for the warrior", () => {
 
         var parseResult: IParseResult = DataHelper.buildParseResult([]);
         var core = buildCore(0);
@@ -113,7 +113,7 @@ describe("WarriorLoader",() => {
         expect(actual.tasks[0].warrior).toBe(actual);
     });
 
-    it("Sets the starting instruction pointer to the load address offset by the value indicated by the ORG instruction",() => {
+    it("Sets the starting instruction pointer to the load address offset by the value indicated by the ORG instruction", () => {
 
         var tokens: IToken[] = [
             {
@@ -140,7 +140,7 @@ describe("WarriorLoader",() => {
         expect(actual.tasks[0].instructionPointer).toBe(7);
     });
 
-    it("Loads the warrior into the core at the specified address",() => {
+    it("Loads the warrior into the core at the specified address", () => {
 
         var tokens = DataHelper.buildParseResult(instruction("MOV", ".I", "$", 0, "$", 1));
         var core = buildCore(30);
@@ -150,15 +150,20 @@ describe("WarriorLoader",() => {
 
         for (var i = 0; i < 30; i++) {
 
+            var instr = core.readAt(null, i);
+            expect(instr.address).toBe(i);
+
             if (i === 21) {
-                expect(core.readAt(null, i).opcode).toBe(OpcodeType.MOV);
+                expect(instr.opcode).toBe(OpcodeType.MOV);
             } else {
-                expect(core.readAt(null, i).opcode).toBe(OpcodeType.DAT);
+                expect(instr.opcode).toBe(OpcodeType.DAT);
             }
         }
+
+        expect(core.getSize()).toBe(30);
     });
 
-    it("Correctly interprets token opcodes into simulator instructions",() => {
+    it("Correctly interprets token opcodes into simulator instructions", () => {
 
         var core = buildCore(20);
 
@@ -184,7 +189,7 @@ describe("WarriorLoader",() => {
         expect(core.readAt(null, 16).opcode).toBe(OpcodeType.NOP);
     });
 
-    it("Correctly interprets token modifiers into simulator instructions",() => {
+    it("Correctly interprets token modifiers into simulator instructions", () => {
 
         var core = buildCore(20);
 
@@ -210,7 +215,7 @@ describe("WarriorLoader",() => {
         expect(core.readAt(null, 16).modifier).toBe(ModifierType.B);
     });
 
-    it("Correctly interprets token a mode into simulator instructions",() => {
+    it("Correctly interprets token a mode into simulator instructions", () => {
 
         var core = buildCore(20);
 
@@ -236,7 +241,7 @@ describe("WarriorLoader",() => {
         expect(core.readAt(null, 16).aOperand.mode).toBe(ModeType.Immediate);
     });
 
-    it("Correctly interprets token a number into simulator instructions",() => {
+    it("Correctly interprets token a number into simulator instructions", () => {
 
         var core = buildCore(20);
 
@@ -262,7 +267,7 @@ describe("WarriorLoader",() => {
         expect(core.readAt(null, 16).aOperand.address).toBe(0);
     });
 
-    it("Correctly interprets token b mode into simulator instructions",() => {
+    it("Correctly interprets token b mode into simulator instructions", () => {
 
         var core = buildCore(20);
 
@@ -288,7 +293,7 @@ describe("WarriorLoader",() => {
         expect(core.readAt(null, 16).bOperand.mode).toBe(ModeType.Immediate);
     });
 
-    it("Correctly interprets token b number into simulator instructions",() => {
+    it("Correctly interprets token b number into simulator instructions", () => {
 
         var core = buildCore(20);
 
@@ -314,7 +319,7 @@ describe("WarriorLoader",() => {
         expect(core.readAt(null, 16).bOperand.address).toBe(0);
     });
 
-    it("Correctly sets the startAddress property of the warrior",() => {
+    it("Correctly sets the startAddress property of the warrior", () => {
 
         var tokens = DataHelper.buildParseResult(instruction("MOV", ".I", "$", 0, "$", 1));
 
