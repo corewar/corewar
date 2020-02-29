@@ -2,6 +2,8 @@
 
 ![Corewar](https://github.com/corewar/corewar/blob/master/logo.png)
 
+# NOTE: This repository has been deprecated and moved to our new home in the monorepo at: https://github.com/corewar/corewar.io
+
 # Corewar
 
 Typescript / Javascript implementation of the classic game [corewar](https://en.wikipedia.org/wiki/Core_War)
